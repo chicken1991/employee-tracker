@@ -2,6 +2,8 @@ const express = require('express');
 const mysql = require('mysql2');
 // const inquirer = require('inquirer');
 const cTable = require('console.table');
+const path = require('path');
+const api = require('./routes/index.js');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -9,6 +11,7 @@ const app = express();
 // Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use('/api', api);
 
 // Connect to database
 const db = mysql.createConnection(
@@ -19,6 +22,13 @@ const db = mysql.createConnection(
     database: 'employee_db'
   }
 );
+
+//GET routes
+
+
+//POST route(s)
+
+
 
 console.log("Showing department table");
 db.query('SELECT * FROM department', function(err, results) {
