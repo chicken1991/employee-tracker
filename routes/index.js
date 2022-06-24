@@ -1,14 +1,7 @@
-const express = require('express');
+const router = require('express').Router();
+const apiRoutes = require('./api');
 
-const employeesRouter = require('./employees');
-const rolesRouter = require('./roles');
-const departmentsRouter = require('./departments');
+router.use('/api', apiRoutes);
 
 
-const app = express();
-
-app.use('/employees', employeesRouter);
-app.use('/roles', rolesRouter);
-app.use('/depaprtments', departmentsRouter);
-
-module.exports = app;
+module.exports = router;
