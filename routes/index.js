@@ -1,7 +1,10 @@
 const router = require('express').Router();
-const apiRoutes = require('./api');
+const rolesRoutes = require('./api/roles');
+const employeesRoutes = require('./api/employees');
+const departmentsRoutes = require('./api/departments');
 
-router.use('/api', apiRoutes);
-
+router.use('/roles', rolesRoutes);
+router.use('/employees', employeesRoutes);
+router.use('/departments', departmentsRoutes);
 
 module.exports = router;

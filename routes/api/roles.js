@@ -1,11 +1,15 @@
-const router= require('express').Router();
+const router = require('express').Router();
 const fs = require('fs');
-// const queries = require('../../../assets/js/queries');
+const queries = require('../../assets/js/queries');
+
+
+const newQ = new queries();
 
 router.get('/', (req, res) => {
     console.info(`${req.method} request received for feedback`);
-  
-    // Read the employee_db.employees table and display using the console.table package 
+    // Read the employee_db.employees table and display using the console.table package
+    newQ.showRoles();
+
   });
 
   router.post('/', (req, res) => { // <======= Route should be /api or something?
@@ -15,4 +19,4 @@ router.get('/', (req, res) => {
     // Utilize queries to insert into table 
   });
 
-  module.exports = router;
+module.exports = router;
