@@ -2,7 +2,6 @@ const router = require('express').Router();
 const fs = require('fs');
 const queries = require('../../assets/js/queries');
 
-
 const newQ = new queries();
 
 router.get('/', (req, res) => {

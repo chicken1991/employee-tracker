@@ -8,28 +8,28 @@ class Queries {
 
     showDepartments() {
         console.log("Showing department table")
-        db.promise().query('SELECT * FROM departments', function (err, results) {
-            console.log(results);
+        db.query('SELECT * FROM departments', function (err, results) {
+            console.table(results);
         });
     }
     showRoles() {
         console.log("Showing roles table")
         db.query('SELECT * FROM roles', function (err, results) {
-            console.log(results);
+            console.table(results);
         });
     }
 
     showEmployees() {
         console.log("Showing employees table")
         db.query('SELECT * FROM employees', function (err, results) {
-            console.log(results);
+            console.table(results);
         });
     }
 
     createDepartment(name) {
         console.log("Creating new Department")
             db.query(`INSERT INTO departments VALUE ${name}`, function (err, results) {
-                console.log(results + "what is undefined?");
+                console.table(results + "what is undefined?");
             });
     }
 }
@@ -46,7 +46,7 @@ class Queries {
 function createDepartment(name) {
     console.log("Showing employees table")
         db.query('SELECT * FROM employees', function (err, results) {
-            console.log(results);
+            console.table(results);
         });
 }
 
