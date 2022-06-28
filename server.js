@@ -1,11 +1,13 @@
 const express = require('express');
 const mysql = require('mysql2');
-// const inquirer = require('inquirer');
 const routes = require('./routes');
 const inquirer = require('inquirer');
-const axios = require('axios');
 
+//Helper file Requests
+const Requests = require('./assets/js/requests');
+const requests = new Requests();
 
+//Server port
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -26,6 +28,8 @@ app.listen(PORT, () => {
 
 //Inquirer stuff!!
 
+//PromptInit gives you the "main menu" to the app. This utilizes Requests 
+// file that calls upon axios to do the requests to the server
 const promptInit = () => {
   inquirer
   .prompt
@@ -47,47 +51,25 @@ const promptInit = () => {
     switch(data.answer) {
       case "View all departments":
         //Call the route for showing departments table
-        axios
-          .get('http://localhost:3001/api/departments')
-          .then(res => {
-            console.log(`statusCode: ${res.status}`);
-            console.log(res);
-          })
-          .catch(error => {
-            console.error(error);
-          });
-          console.log("What would you like to do next?");
-          promptInit();
+       requests.getRequest("departments");
         break;
       case "View all roles":
-        axios
-          .get('http://localhost:3001/api/roles')
-          .then(res => {
-            console.log(`statusCode: ${res.status}`);
-            console.log(res);
-          })
-          .catch(error => {
-            console.error(error);
-          });
+        requests.getRequest("roles");
         break;
       case "View all employees":
-        axios
-          .get('http://localhost:3001/api/employees')
-          .then(res => {
-            console.log(`statusCode: ${res.status}`);
-            console.log(res);
-          })
-          .catch(error => {
-            console.error(error);
-          });
+        requests.getRequest("employees");
         break;
       case "Add department":
+        requests.postRequest("departments");
         break;
       case "Add role":
+        requests.postRequest("roles");
         break;
       case "Add employee":
+        requests.postRequest("employees");
         break; 
       case "Update employee role":
+        updateEmployee();
         break;   
     }
 })
