@@ -8,7 +8,7 @@ class Queries {
 
     showDepartments() {
         console.log("Showing department table")
-        db.query('SELECT * FROM departments', function (err, results) {
+        db.query('SELECT department_name FROM departments', function (err, results) {
             console.table(results);
         });
     }
@@ -47,6 +47,8 @@ class Queries {
                 console.log(`${name} added to Roles`);
             });
         }
+
+        // modifyEmployee()  ==== DO THIS (eventually)
 }
 
 module.exports = Queries;

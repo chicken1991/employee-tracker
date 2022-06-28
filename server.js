@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const routes = require('./routes');
 const inquirer = require('inquirer');
+const db = require('./config/connection');
 
 //Helper file Requests
 const Requests = require('./assets/js/requests');
@@ -50,20 +51,20 @@ const promptInit = () => {
 }])
   .then((data) => {
     switch(data.answer) {
-      case "View all departments":
+      case "View all departments": //done
         //Call the route for showing departments table
        requests.getRequest("departments");
         break;
-      case "View all roles":
+      case "View all roles": // done
         requests.getRequest("roles");
         break;
-      case "View all employees":
+      case "View all employees": //done 
         requests.getRequest("employees");
         break;
-      case "Add department":
+      case "Add department":  //done
         promptNewDep()
         break;
-      case "Add role":
+      case "Add role": 
         requests.postRequest("roles");
         break;
       case "Add employee":
@@ -92,8 +93,39 @@ const promptNewDep = () => {
     .catch((err) => console.error(err));
   };
 
+  const promptNewRole = () => {
+    const depts = db.query('SELECT department_name FROM departments');
+    console.table(depts); 
+    // inquirer
+    // .prompt([
+    //   {
+    //     type: 'input',
+    //     name: 'title',
+    //     message: "Input the new Role title",
+    //   },
+    //   {
+    //     type: 'input',
+    //     name: 'title',
+    //     message: "Input the new Role title",
+    //   },
+    //   {
+    //     type: 'list',
+    //     name: 'title',
+    //     message: "Select which department this role is part of",
+    //     choices: [ 
+    //     ]
+    //   }
+    // ])
+    //   .then((val) => {
+    //     requests.postRequest("departments", val.name, null)
+    //   })
+    //   .catch((err) => console.error(err));
+    };
+
 const init = () => {
 promptInit();
 }
 
-init();
+promptNewRole();
+
+// init();
