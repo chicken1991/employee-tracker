@@ -1,8 +1,9 @@
 const express = require('express');
 const mysql = require('mysql2');
 // const inquirer = require('inquirer');
-const cTable = require('console.table');
 const routes = require('./routes');
+const inquirer = require('inquirer');
+const axios = require('axios');
 
 
 const PORT = process.env.PORT || 3001;
@@ -13,37 +14,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use('/api', routes);
 
-// Connect to database
-// const db = mysql.createConnection(
-//   {
-//     host: 'localhost',
-//     user: 'root',
-//     password: 'password',
-//     database: 'employee_db'
-//   }
-// );
-
-// app.get('/api/departments', (req, res) => {
-//   console.info(`${req.method} request received for feedback`);
-//   // Read the employee_db.employees table and display using the console.table package
-//   // res = queries.showDepartments();
-// });
-
-// console.log("Showing department table")
-// db.query('SELECT * FROM departments', function(err, results) {
-//     console.log(results);
-// });
-
-// console.log("Showing roles");
-// db.query('SELECT * FROM roles', function(err, results) {
-//     console.log(results);
-// });
-
-// console.log("Showing employeess");
-// db.query('SELECT * FROM employees', function(err, results) {
-//     console.log(results);
-// });
-
 // Default response for any other request (Not Found)
 app.use((req, res) => {
   res.status(404).end();
@@ -52,3 +22,82 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+//Inquirer stuff!!
+
+const promptInit = () => {
+  inquirer
+  .prompt
+  ([{
+      type: 'list',
+      name: 'answer',
+      message: "Select what you would like to do",
+      choices: [
+        "View all departments",
+        "View all roles",
+        "View all employees",
+        "Add department",
+        "Add role",
+        "Add employee",
+        "Update employee role"
+      ]
+}])
+  .then((data) => {
+    switch(data.answer) {
+      case "View all departments":
+        //Call the route for showing departments table
+        axios
+          .get('http://localhost:3001/api/departments')
+          .then(res => {
+            console.log(`statusCode: ${res.status}`);
+            console.log(res);
+          })
+          .catch(error => {
+            console.error(error);
+          });
+          console.log("What would you like to do next?");
+          promptInit();
+        break;
+      case "View all roles":
+        axios
+          .get('http://localhost:3001/api/roles')
+          .then(res => {
+            console.log(`statusCode: ${res.status}`);
+            console.log(res);
+          })
+          .catch(error => {
+            console.error(error);
+          });
+        break;
+      case "View all employees":
+        axios
+          .get('http://localhost:3001/api/employees')
+          .then(res => {
+            console.log(`statusCode: ${res.status}`);
+            console.log(res);
+          })
+          .catch(error => {
+            console.error(error);
+          });
+        break;
+      case "Add department":
+        break;
+      case "Add role":
+        break;
+      case "Add employee":
+        break; 
+      case "Update employee role":
+        break;   
+    }
+})
+  .catch((err) => console.error(err));
+};
+
+
+
+const init = () => {
+promptInit();
+}
+
+init();
