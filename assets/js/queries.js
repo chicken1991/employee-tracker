@@ -12,6 +12,7 @@ class Queries {
             console.table(results);
         });
     }
+
     showRoles() {
         console.log("Showing roles table")
         db.query('SELECT * FROM roles', function (err, results) {
@@ -27,41 +28,25 @@ class Queries {
     }
 
     createDepartment(name) {
-        console.log("Creating new Department")
-            db.query(`INSERT INTO departments VALUE ${name}`, function (err, results) {
-                console.table(results + "what is undefined?");
+        console.log(`Creating new Department`)
+            db.query(`INSERT INTO departments (department_name) VALUES ('${name}')`, function (err, results) {
+                console.log(`${name} added to Departments`);
             });
     }
+
+    createRole(name, title, salary, dep_id) {
+        console.log(`Creating new Role`)
+            db.query(`INSERT INTO roles (title,salary,department_id) VALUEs(${title},${salary},${dep_id})`, function (err, results) {
+                console.log(`${name} added to Roles`);
+            });
+    }
+
+    createEmployee(firstName, lastName, role_id, manager_id) {
+        console.log(`Creating new Role`)
+            db.query(`INSERT INTO roles (first_name,last_name,role_id,manager_id) VALUEs(${firstName},${lastName},${role_id},${manager_id})`, function (err, results) {
+                console.log(`${name} added to Roles`);
+            });
+        }
 }
-
-//Show departments
-// Queries.showDepartments() {
-//     return `SELECT * FROM departments`
-// }
-
-
-
-//create departments
-
-function createDepartment(name) {
-    console.log("Showing employees table")
-        db.query('SELECT * FROM employees', function (err, results) {
-            console.table(results);
-        });
-}
-
-//create roles
-
-//create employees
-
-//modify departments
-
-//modify roles
-
-//modify employees
-
-//module.exports = { class1, class2 }
-
-//Exports
 
 module.exports = Queries;

@@ -18,10 +18,10 @@ class Requests {
             });
     };
 
-    //POST request
-    postRequest(item) {
+    //POST request ======================= Needs a body to post
+    postRequest(item, subitem, body) {
         axios
-            .post(`http://localhost:3001/api/${item}`)
+            .post(`http://localhost:3001/api/${item}/${subitem}`, body)
             .then(res => {
                 console.log(`statusCode: ${res.status}`);
                 console.log(res);
@@ -31,7 +31,7 @@ class Requests {
             });
     };
 
-    //PUT request
+    //PUT request  ========================= might need some sort of body or something?
     putRequest(item, subitem) {
         axios
             .put(`http://localhost:3001/api/${item}/${subitem}`)

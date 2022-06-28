@@ -5,6 +5,7 @@ const inquirer = require('inquirer');
 
 //Helper file Requests
 const Requests = require('./assets/js/requests');
+const { request } = require('express');
 const requests = new Requests();
 
 //Server port
@@ -60,7 +61,7 @@ const promptInit = () => {
         requests.getRequest("employees");
         break;
       case "Add department":
-        requests.postRequest("departments");
+        promptNewDep()
         break;
       case "Add role":
         requests.postRequest("roles");
@@ -76,7 +77,20 @@ const promptInit = () => {
   .catch((err) => console.error(err));
 };
 
-
+const promptNewDep = () => {
+  inquirer
+  .prompt([
+    {
+      type: 'input',
+      name: 'name',
+      message: "Input the new department name",
+    }
+  ])
+    .then((val) => {
+      requests.postRequest("departments", val.name, null)
+    })
+    .catch((err) => console.error(err));
+  };
 
 const init = () => {
 promptInit();
