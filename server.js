@@ -1,8 +1,10 @@
 const express = require('express');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const routes = require('./routes');
 const inquirer = require('inquirer');
 const db = require('./config/connection');
+const QUERIES = require('./assets/js/queries');
+
 
 //Helper file Requests
 const Requests = require('./assets/js/requests');
@@ -65,7 +67,8 @@ const promptInit = () => {
         promptNewDep()
         break;
       case "Add role": 
-        requests.postRequest("roles");
+        // requests.postRequest("roles");
+        promptNewRole();
         break;
       case "Add employee":
         requests.postRequest("employees");
@@ -94,38 +97,36 @@ const promptNewDep = () => {
   };
 
   const promptNewRole = () => {
-    const depts = db.query('SELECT department_name FROM departments');
-    console.table(depts); 
-    // inquirer
-    // .prompt([
-    //   {
-    //     type: 'input',
-    //     name: 'title',
-    //     message: "Input the new Role title",
-    //   },
-    //   {
-    //     type: 'input',
-    //     name: 'title',
-    //     message: "Input the new Role title",
-    //   },
-    //   {
-    //     type: 'list',
-    //     name: 'title',
-    //     message: "Select which department this role is part of",
-    //     choices: [ 
-    //     ]
-    //   }
-    // ])
-    //   .then((val) => {
-    //     requests.postRequest("departments", val.name, null)
-    //   })
-    //   .catch((err) => console.error(err));
+    const depts = () => { return new Map(requests.getRequest("departments")); } //this doesn't work, dog.
+    inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'title',
+        message: "Input the new Role title",
+      },
+      {
+        type: 'input',
+        name: 'salary',
+        message: "Input the new Role salary",
+      },
+      {
+        type: 'list',
+        name: 'dept',
+        message: "Select which department this role is part of",
+        choices: depts()
+      }
+    ])
+      .then((val) => {
+        requests.postRequest("departments", val.name, null)
+      })
+      .catch((err) => console.error(err));
     };
 
 const init = () => {
 promptInit();
 }
 
-promptNewRole();
+// promptNewRole();
 
-// init();
+init();

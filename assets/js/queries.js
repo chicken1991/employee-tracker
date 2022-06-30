@@ -8,9 +8,12 @@ class Queries {
 
     showDepartments() {
         console.log("Showing department table")
-        db.query('SELECT department_name FROM departments', function (err, results) {
-            console.table(results);
-        });
+        db.promise().query('SELECT department_name FROM departments')
+        .then( ([rows,fields]) => {
+            console.table(rows);
+          })
+        //   .catch(console.log)
+          .then( () => db.end());
     }
 
     showRoles() {
