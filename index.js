@@ -36,13 +36,13 @@ const promptInit = () => {
       case "View all departments":
         showDepartments();
         break;
-      case "View all roles": // done
+      case "View all roles": // done?
         showRoles();
         break;
-      case "View all employees": //done 
+      case "View all employees": //done ?
         showEmployees();
         break;
-      case "Add department":  //done
+      case "Add department":  //done?
         promptNewDep();
         break;
       case "Add role": 
@@ -74,8 +74,9 @@ const promptNewDep = () => {
     .catch((err) => console.error(err));
   };
 
+  // ===========================================================================================================================
   const promptNewRole = () => {
-    const depts = Q.returnDepartments();
+
     inquirer
     .prompt([
       {
@@ -92,11 +93,12 @@ const promptNewDep = () => {
         type: 'list',
         name: 'dept',
         message: "Select which department this role is part of",
-        choices: depts
+        choices: deptArray
       }
     ])
       .then((val) => {
-        createRole(val.title, val.salary, val.dept)
+        console.log(val.dept);
+        // createRole(val.title, val.salary, val.dept.id)
       })
       .catch((err) => console.error(err));
     };
@@ -123,11 +125,6 @@ const init = () => {
 promptInit();
 }
 
-// promptNewRole();
-
-init();
-
-
 // Queries
 
 function showDepartments() {
@@ -145,7 +142,7 @@ function returnDepartments() {
   var choices;
   db.promise().query('SELECT * FROM departments')
     .then( ([rows,fields]) => {
-      console.table(rows);
+      return fields;
     })
     .catch(console.log)
     .then(promptInit());
@@ -191,8 +188,9 @@ function createDepartment(name) {
 function createRole(title, salary, dep_id) {
   console.log(`Creating new Role`)
       db.query(`INSERT INTO roles (title,salary,department_id) VALUEs(${title},${salary},${dep_id})`, function (err, results) {
-          console.log(`${name} added to Roles`);
-      });
+          // console.log(`${title} added to Roles`);
+          showRoles();
+      })
 }
 
 function createEmployee(firstName, lastName, role_id, manager_id) {
@@ -201,3 +199,25 @@ function createEmployee(firstName, lastName, role_id, manager_id) {
           console.log(`${name} added to Roles`);
       });
   }
+
+
+
+  function deptArray() {
+    return new Promise(
+      (resolve, reject) => {
+        db.query("SELECT * FROM departments", (err, rows) => {
+          if (err) {
+            reject(err);
+          }
+          // resolve(rows.map(row => row.department_name));
+          resolve(rows.map(({id, department_name}) => ({id: id, name: department_name})));
+        })
+      }
+    );
+  }
+
+  // deptArray().then(myArray => {
+  //   console.log(myArray);
+  // });
+
+  init();
