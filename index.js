@@ -1,5 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const cTable = require('console.table');
+
 const db = mysql.createConnection(
   {
     host: 'localhost',
@@ -184,7 +186,7 @@ const init = () => {
 
 function showDepartments() {
   console.log("Showing department table")
-  db.promise().query('SELECT department_name FROM departments')
+  db.promise().query('SELECT * FROM departments')
     .then(([rows, fields]) => {
       console.table(rows);
       promptContinue()
@@ -216,8 +218,6 @@ function showEmployees() {
 
 // ================================================== CREATE QUERY SECTION ========================================================
 
-
-//CREATE ROLE
 function createRole(roleName, roleSal, depName) {
   const name = roleName;
   const sal = roleSal;
@@ -225,7 +225,6 @@ function createRole(roleName, roleSal, depName) {
 
   db.promise().query(`SELECT id FROM departments where department_name = ?`, [dep])
     .then(([rows, fields]) => {
-      console.log(rows[0].id);
       db.query(`INSERT INTO roles (title,salary,department_id) VALUEs("${name}","${sal}","${rows[0].id}")`, function (err, results) {
       });
       showRoles();
@@ -252,13 +251,11 @@ function createEmployee(firstName, lastName, defRole, defManager) {
   db.promise().query(`SELECT id FROM employees where CONCAT(first_name, ' ', last_name) = ?`, [manager])
     .then(([rows, fields]) => {
       manID = rows[0].id;
-      console.log(manID);
       db.promise().query(`SELECT id FROM roles where title = ?`, [role])
         .then(([rows, fields]) => {
           roleID = rows[0].id;
           db.query(`INSERT INTO employees (first_name,last_name,role_id,manager_id) VALUEs("${fname}","${lname}","${roleID}","${manID}")`, function (err, results) {
           });
-          console.log("Added with the following status... : " + `"${fname}","${lname}","${roleID}","${manID}"`);
           showEmployees();
         })
     })
@@ -266,9 +263,7 @@ function createEmployee(firstName, lastName, defRole, defManager) {
 }
 
 function modifyEmployee(name, defRole) {
-  console.log(name);
   let nameArray = name.split(/(\s+)/);
-  console.log(nameArray);
   const fname = nameArray[0];
   const lname = nameArray[2];
   const role = defRole;
@@ -277,13 +272,10 @@ function modifyEmployee(name, defRole) {
   db.promise().query(`SELECT id FROM employees where CONCAT(first_name, ' ', last_name) = ?`, [name])
     .then(([rows, fields]) => {
       empID = rows[0].id;
-      console.log(empID);
       db.promise().query(`SELECT id FROM roles where title = ?`, [role])
         .then(([rows, fields]) => {
           roleID = rows[0].id;
-          console.log("roleID is: " + roleID);
           db.query(`UPDATE employees SET first_name = "${fname}", last_name = "${lname}", role_id = "${roleID}" WHERE id = "${empID}"`, function (err, results) {
-            console.log("The SQL is: " + `UPDATE employees SET first_name = "${fname}", last_name = "${lname}", role_id = "${roleID}" WHERE id = "${empID}"`);
           });
           showEmployees();
         })
@@ -358,8 +350,5 @@ function managerArray() {
   );
 }
 
-// deptArray().then(myArray => {
-//   console.log(myArray);
-// });
 
 init();
