@@ -50,7 +50,7 @@ const promptInit = () => {
           promptNewRole();
           break;
         case "Add employee":
-          requests.postRequest("employees");
+          promptNewEmployee();
           break;
         case "Update employee role":
           updateEmployee();
@@ -59,6 +59,8 @@ const promptInit = () => {
     })
     .catch((err) => console.error(err));
 };
+
+// ================================================== PROMPT SECTION ========================================================
 
 const promptNewDep = () => {
   inquirer
@@ -70,12 +72,11 @@ const promptNewDep = () => {
       }
     ])
     .then((val) => {
-      requests.postRequest("departments", val.name, null)
+      createDepartment(val.name)
     })
     .catch((err) => console.error(err));
 };
 
-// ===========================================================================================================================
 const promptNewRole = () => {
   inquirer
     .prompt([
@@ -96,43 +97,66 @@ const promptNewRole = () => {
         choices: deptArray
       }
     ])
-    .then((val) => {        
-      depID(val.title, val.salary, val.dept);
-     })
+    .then((val) => {
+      createRole(val.title, val.salary, val.dept);
+    })
     .catch((err) => console.error(err));
 };
 
-// const depID = function(val.dept){
-//   db.promise().query(`SELECT id FROM departments where department_name = ?`, [val.dept])
-//   .then(([rows, fields]) => {
-//     ID = rows[0].id;
-//     dep_ID = rows[0].id;
-//     console.log(dep_ID);
-//     })
-//   .catch(console.log);
-// };
-
-function depID(roleName,roleSal,depName) {
-  const name = roleName;
-  const sal = roleSal;
-  const dep = depName;
-  console.log(name + ": " + sal + ": " + dep);
-  db.promise().query(`SELECT id FROM departments where department_name = ?`, [dep])
-  .then(([rows, fields]) => {
-    console.log(rows[0].id);
-    db.query(`INSERT INTO roles (title,salary,department_id) VALUEs("${name}","${sal}","${rows[0].id}")`, function (err, results) {
-      console.log(`${name}: ${sal}: ${rows[0].id}`);
-    });
+const promptNewEmployee = () => {
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'firstName',
+        message: "Input the employee's first name",
+      },
+      {
+        type: 'input',
+        name: 'lastName',
+        message: "Input the employees last name",
+      },
+      {
+        type: 'list',
+        name: 'role',
+        message: "Select the role this employee will have",
+        choices: roleArray
+      },
+      {
+        type: 'list',
+        name: 'manager',
+        message: "Select the manager this employee will have",
+        choices: managerArray
+      }
+    ])
+    .then((val) => {
+      createEmployee(val.firstName, val.lastName, val.role, val.manager);
     })
-  .catch(console.log);
+    .catch((err) => console.error(err));
 };
 
-// function depID(name) {
-//   let ID = db.query(`SELECT id FROM departments where department_name = "${name}"`, function(err, result) {
-//       return result;
-//   });
-//   console.log(ID[0]);
-// };
+
+function updateEmployee(){
+    inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'employee',
+        message: "Select which employee to update",
+        choices: employeeArray
+      },
+      {
+        type: 'list',
+        name: 'role',
+        message: "Select a role to update for this employee",
+        choices: roleArray
+      }
+    ])
+    .then((val) => {
+      modifyEmployee(val.employee, val.role);
+    })
+    .catch((err) => console.error(err));
+};
 
 function promptContinue() {
   inquirer.prompt(
@@ -156,27 +180,18 @@ const init = () => {
   promptInit();
 }
 
-// Queries
+// ================================================== SHOW QUERY FUNCTIONS ========================================================
 
 function showDepartments() {
   console.log("Showing department table")
   db.promise().query('SELECT department_name FROM departments')
     .then(([rows, fields]) => {
       console.table(rows);
+      promptContinue()
     })
     .catch(console.log)
     // .then( () => db.end())
-    .then(promptContinue());
-}
-
-function returnDepartments() {
-  var choices;
-  db.promise().query('SELECT * FROM departments')
-    .then(([rows, fields]) => {
-      return fields;
-    })
-    .catch(console.log)
-    .then(promptInit());
+    
 }
 
 function showRoles() {
@@ -184,19 +199,9 @@ function showRoles() {
   db.promise().query('SELECT * FROM roles')
     .then(([rows, fields]) => {
       console.table(rows);
+      promptContinue()
     })
     .catch(console.log)
-    .then(promptInit());
-}
-
-function returnRoles() {
-  console.log("Showing roles table")
-  db.promise().query('SELECT * FROM roles')
-    .then(([rows, fields]) => {
-      console.table(rows);
-    })
-    .catch(console.log)
-    .then(promptInit());
 }
 
 function showEmployees() {
@@ -204,34 +209,91 @@ function showEmployees() {
   db.promise().query('SELECT * FROM employees')
     .then(([rows, fields]) => {
       console.table(rows);
+      promptContinue()
     })
     .catch(console.log)
-    .then(promptInit());
 }
+
+// ================================================== CREATE QUERY SECTION ========================================================
+
+
+//CREATE ROLE
+function createRole(roleName, roleSal, depName) {
+  const name = roleName;
+  const sal = roleSal;
+  const dep = depName;
+
+  db.promise().query(`SELECT id FROM departments where department_name = ?`, [dep])
+    .then(([rows, fields]) => {
+      console.log(rows[0].id);
+      db.query(`INSERT INTO roles (title,salary,department_id) VALUEs("${name}","${sal}","${rows[0].id}")`, function (err, results) {
+      });
+      showRoles();
+    })
+    .catch(console.log);
+};
 
 function createDepartment(name) {
   console.log(`Creating new Department`)
   db.query(`INSERT INTO departments (department_name) VALUES ('${name}')`, function (err, results) {
     console.log(`${name} added to Departments`);
+    showDepartments();
   });
 }
 
-function createRole(title, salary, dep_id) {
-  console.log(`Creating new Role`)
-  db.query(`INSERT INTO roles (title,salary,department_id) VALUEs("${title}","${salary}","${dep_id}")`, function (err, results) {
-    // console.log(`${title} added to Roles`);
-    showRoles();
-  })
+function createEmployee(firstName, lastName, defRole, defManager) {
+  const fname = firstName;
+  const lname = lastName;
+  const role = defRole;
+  const manager = defManager;
+  let roleID;
+  let manID;
+
+  db.promise().query(`SELECT id FROM employees where CONCAT(first_name, ' ', last_name) = ?`, [manager])
+    .then(([rows, fields]) => {
+      manID = rows[0].id;
+      console.log(manID);
+      db.promise().query(`SELECT id FROM roles where title = ?`, [role])
+        .then(([rows, fields]) => {
+          roleID = rows[0].id;
+          db.query(`INSERT INTO employees (first_name,last_name,role_id,manager_id) VALUEs("${fname}","${lname}","${roleID}","${manID}")`, function (err, results) {
+          });
+          console.log("Added with the following status... : " + `"${fname}","${lname}","${roleID}","${manID}"`);
+          showEmployees();
+        })
+    })
+    .catch(console.log);
 }
 
-function createEmployee(firstName, lastName, role_id, manager_id) {
-  console.log(`Creating new Role`)
-  db.query(`INSERT INTO roles (first_name,last_name,role_id,manager_id) VALUEs(${firstName},${lastName},${role_id},${manager_id})`, function (err, results) {
-    console.log(`${name} added to Roles`);
-  });
+function modifyEmployee(name, defRole) {
+  console.log(name);
+  let nameArray = name.split(/(\s+)/);
+  console.log(nameArray);
+  const fname = nameArray[0];
+  const lname = nameArray[2];
+  const role = defRole;
+  let roleID;
+
+  db.promise().query(`SELECT id FROM employees where CONCAT(first_name, ' ', last_name) = ?`, [name])
+    .then(([rows, fields]) => {
+      empID = rows[0].id;
+      console.log(empID);
+      db.promise().query(`SELECT id FROM roles where title = ?`, [role])
+        .then(([rows, fields]) => {
+          roleID = rows[0].id;
+          console.log("roleID is: " + roleID);
+          db.query(`UPDATE employees SET first_name = "${fname}", last_name = "${lname}", role_id = "${roleID}" WHERE id = "${empID}"`, function (err, results) {
+            console.log("The SQL is: " + `UPDATE employees SET first_name = "${fname}", last_name = "${lname}", role_id = "${roleID}" WHERE id = "${empID}"`);
+          });
+          showEmployees();
+        })
+    })
+    .catch(console.log);
 }
 
 
+
+// ============================================ ARRAY HELPER FUNCTIONS ========================================
 
 function deptArray() {
   return new Promise(
@@ -243,6 +305,53 @@ function deptArray() {
         // resolve(rows.map(row => row.department_name));
         // resolve(rows.map(({id, department_name}) => ({id: id, name: department_name})));
         let rowArray = rows.map(({ id, department_name }) => ({ id: id, name: department_name }));
+        resolve(rowArray);
+      })
+    }
+  );
+}
+
+function employeeArray() {
+  return new Promise(
+    (resolve, reject) => {
+      db.query("SELECT * FROM employees", (err, rows) => {
+        if (err) {
+          reject(err);
+        }
+        let rowArray = rows.map(({ id, first_name, last_name }) => ({ id: id, name: first_name + " " + last_name}));
+        resolve(rowArray);
+      })
+    }
+  );
+}
+
+function roleArray() {
+  return new Promise(
+    (resolve, reject) => {
+      db.query("SELECT * FROM roles", (err, rows) => {
+        if (err) {
+          reject(err);
+        }
+        // resolve(rows.map(row => row.department_name));
+        // resolve(rows.map(({id, department_name}) => ({id: id, name: department_name})));
+        let rowArray = rows.map(({ id, title }) => ({ id: id, name: title }));
+        resolve(rowArray);
+      })
+    }
+  );
+}
+
+
+function managerArray() {
+  return new Promise(
+    (resolve, reject) => {
+      db.query("SELECT * FROM employees WHERE role_id = 1", (err, rows) => {
+        if (err) {
+          reject(err);
+        }
+        // resolve(rows.map(row => row.department_name));
+        // resolve(rows.map(({id, department_name}) => ({id: id, name: department_name})));
+        let rowArray = rows.map(({ id, first_name, last_name }) => ({ id: id, name: first_name + " " + last_name }));
         resolve(rowArray);
       })
     }
