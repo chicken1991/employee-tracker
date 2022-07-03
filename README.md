@@ -19,7 +19,12 @@
 
   <a name="Installation"></a>
   ## Installation
-  Clone this repo, run "npm i", then "node index.js" to run the app.
+  1. Clone this repo
+  2. run "npm i"
+  3. log into mysql shell
+  4. SOURCE db/schema.sql
+  5. SOURCE db/seeds.sql
+  6. run "node index.js" to run app
 
   <a name="Usage"></a>
   ## Usage
